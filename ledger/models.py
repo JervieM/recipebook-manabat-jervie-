@@ -33,7 +33,7 @@ class Ingredient(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    quantity = models.CharField(max_length=255)
+    quantity = models.FloatField()
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -70,3 +70,6 @@ class RecipeImage(models.Model):
     )
     description = models.TextField(max_length=255)
     image = models.ImageField(upload_to="images/")
+
+    def __str__(self):
+        return self.description
