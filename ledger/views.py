@@ -27,7 +27,7 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user.profile
         return super().form_valid(form)
 
-class RecipeImageCreateView(LoginRequiredMixin, CreateView):
+class ImageCreateView(LoginRequiredMixin, CreateView):
     model = RecipeImage
     template_name = "recipe_add_image.html"
     form_class = RecipeImageForm
