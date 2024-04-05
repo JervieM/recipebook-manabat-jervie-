@@ -1,134 +1,42 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 
-def recipes(request):
-    ctx = {
-    "recipes": [
-        {
-            "name": "Recipe 1",
-            "ingredients": [
-                {
-                    "name": "tomato",
-                    "quantity": "3pcs"
-                },
-                {
-                    "name": "onion",
-                    "quantity": "1pc"
-                },
-                {
-                    "name": "pork",
-                    "quantity": "1kg"
-                },
-                {
-                    "name": "water",
-                    "quantity": "1L"
-                },
-                {
-                    "name": "sinigang mix",
-                    "quantity": "1 packet"
-                }
-            ],
-            "link": "/recipe/1"
-        },
-        {
-            "name": "Recipe 2",
-            "ingredients": [
-                {
-                    "name": "garlic",
-                    "quantity": "1 head"
-                },
-                {
-                    "name": "onion",
-                    "quantity": "1pc"
-                },
-                {
-                    "name": "vinegar",
-                    "quantity": "1/2cup"
-                },
-                {
-                    "name": "water",
-                    "quanity": "1 cup"
-                },
-                {
-                    "name": "salt",
-                    "quantity": "1 tablespoon"
-                },
-                {
-                    "name": "whole black peppers",
-                    "quantity": "1 tablespoon"
-                },
-                {
-                    "name": "pork",
-                    "quantity": "1 kilo"
-                }
-            ],
-            "link": "/recipe/2"
-        }
-    ]
-}
-    return render(request, 'recipes.html', ctx)
+from .forms import *
+from .models import Recipe, RecipeImage
 
-def recipe1(request):
-    ctx = {
-    "name": "Recipe 1",
-    "ingredients": [
-        {
-            "name": "tomato",
-            "quantity": "3pcs"
-        },
-        {
-            "name": "onion",
-            "quantity": "1pc"
-        },
-        {
-            "name": "pork",
-            "quantity": "1kg"
-        },
-        {
-            "name": "water",
-            "quantity": "1L"
-        },
-        {
-            "name": "sinigang mix",
-            "quantity": "1 packet"
-        }
-    ],
-    "link": "/recipe/1"
-}
-    return render(request, 'recipe.html', ctx)
 
-def recipe2(request):
-    ctx = {
-    "name": "Recipe 2",
-    "ingredients": [
-        {
-            "name": "garlic",
-            "quantity": "1 head"
-        },
-        {
-            "name": "onion",
-            "quantity": "1pc"
-        },
-        {
-            "name": "vinegar",
-            "quantity": "1/2cup"
-        },
-        {
-            "name": "water",
-            "quantity": "1 cup"
-        },
-        {
-            "name": "salt",
-            "quantity": "1 tablespoon"
-        },
-        {
-            "name": "whole black peppers",
-            "quantity": "1 tablespoon"
-        },
-        {
-            "name": "pork",
-            "quantity": "1 kilo"
-        }
-    ],
-    "link": "/recipe/2"
-}
-    return render(request, 'recipe.html', ctx)
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = "recipe_list.html"
+
+
+class RecipeDetailView(LoginRequiredMixin,DetailView):
+    model = Recipe
+    template_name = "recipe_detail.html"
+
+
+class RecipeCreateView(LoginRequiredMixin, CreateView):
+    model = Recipe
+    template_name = "recipe_create.html"
+    form_class = RecipeForm
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user.profile
+        return super().form_valid(form)
+
+class RecipeImageCreateView(LoginRequiredMixin, CreateView):
+    model = RecipeImage
+    template_name = "recipe_add_image.html"
+    form_class = RecipeImageForm
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "ledger:recipe_detail", kwargs={"pk": self.object.recipe.pk}
+        )
+
+    def form_valid(self, form):
+        form.instance.recipe = Recipe.objects.get(pk=self.kwargs["pk"])
+        return super().form_valid(form)
