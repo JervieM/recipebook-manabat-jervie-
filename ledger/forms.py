@@ -1,17 +1,18 @@
 from django import forms
 
-from .models import *
+from .models import Recipe, RecipeImage
 
 
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
         fields = "__all__"
-        exclude = ["author"]
+        exclude = ['author']
 
 
 class RecipeImageForm(forms.ModelForm):
     class Meta:
         model = RecipeImage
-        fields = "__all__"
-        exclude = ["recipe"]
+        fields = ['image']
+
+    image = forms.ImageField(label='Upload Image')
