@@ -14,5 +14,3 @@ class RecipeImageForm(forms.ModelForm):
     class Meta:
         model = RecipeImage
         fields = ['image']
-
-    image = forms.ImageField(label='Upload Image')
